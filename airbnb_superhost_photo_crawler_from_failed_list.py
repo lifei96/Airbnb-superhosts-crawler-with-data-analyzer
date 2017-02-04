@@ -73,17 +73,20 @@ def get_photo(uid):
         return
     photo_url = photo_url[0]
     print(photo_url)
-    time.sleep(random.randint(2, 4))
+    time.sleep(random.randint(5, 8))
     urllib.urlretrieve(photo_url, './Data/Superhost/Photos/' + uid + '.jpg')
 
 
 def crawl():
-    superhost_list = read_profile()
+    with open('photo_failed_list.txt', 'r') as f:
+        superhost_list = f.read().split('\n')
+    random.shuffle(superhost_list)
     count = 0
-    for superhost in superhost_list:
+    for uid in superhost_list:
         count += 1
         print(count)
-        uid = superhost[0]
+        if count % 20 == 0:
+            time.sleep(random.randint(30, 40))
         print(uid)
         if os.path.exists('./Data/Superhost/Photos/' + uid + '.jpg'):
             print('-----exists')
@@ -95,7 +98,7 @@ def crawl():
             #     print('-----failed to get name')
             #     name = superhost[1]
             # print(name)
-            time.sleep(random.randint(4, 6))
+            time.sleep(random.randint(5, 8))
             get_photo(uid)
         except Exception as inst:
             print type(inst)
