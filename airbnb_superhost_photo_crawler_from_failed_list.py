@@ -9,6 +9,18 @@ import random
 import time
 
 
+user_agent_list = ['Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/50.0.2661.102 Safari/537.36',
+                   'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36',
+                   'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:50.0) Gecko/20100101 Firefox/50.0',
+                   'Mozilla/5.0 (X11; Linux x86_64; rv:50.0) Gecko/20100101 Firefox/50.0',
+                   'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/55.0.2883.87 Chrome/55.0.2883.87 Safari/537.36',
+                   'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/56.0.2924.76 Safari/537.36',
+                   'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.75 Safari/537.36',
+                   'Mozilla/5.0 (X11; Linux x86_64; rv:51.0) Gecko/20100101 Firefox/51.0',
+                   'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/53.0.2785.143 Chrome/53.0.2785.143 Safari/537.36',
+                   'Mozilla/5.0 (X11; Ubuntu; Linux i686; rv:50.0) Gecko/20100101 Firefox/50.0']
+
+
 def read_profile():
     file_in = open('./Data/Superhost/Profile_Super.txt')
     superhost_list_tmp = file_in.read().split('\n')
@@ -54,16 +66,16 @@ def get_photo(uid):
     cj = cookielib.MozillaCookieJar()
     opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
     req = urllib2.Request(url)
-    req.add_header("User-agent", 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) \
-                    Chrome/50.0.2661.102 Safari/537.36')
+    user_agent = user_agent_list[random.randint(0, len(user_agent_list) - 1)]
+    req.add_header("User-agent", user_agent)
     try:
         response = opener.open(req, timeout=10)
-    except Exception as inst:
-        print type(inst)
-        print inst.args
-        print inst
+    except urllib2.HTTPError, e:
+        print(e.code)
         print('-----fail to get data')
-        mark_failed(uid)
+        if e.code != 404:
+            mark_failed(uid)
+            print('-----marked')
         return
     data = response.read()
     photo_url = re.findall('" class="img-responsive" height="225" src="(.*?)" title="', data)
@@ -74,6 +86,7 @@ def get_photo(uid):
     photo_url = photo_url[0]
     print(photo_url)
     time.sleep(random.randint(5, 8))
+    urllib.URLopener.version = user_agent
     urllib.urlretrieve(photo_url, './Data/Superhost/Photos/' + uid + '.jpg')
 
 
