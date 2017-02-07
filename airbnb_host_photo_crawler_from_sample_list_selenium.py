@@ -57,22 +57,22 @@ def get_photo(uid):
     print(photo_url)
     time.sleep(random.randint(6, 10))
     opener = MyOpener()
-    opener.retrieve(photo_url, './Data/Superhost/Photos/' + uid + '.jpg')
+    opener.retrieve(photo_url, './Data/Host/Photos/' + uid + '.jpg')
     driver.quit()
 
 
 def crawl():
-    with open('photo_failed_list.txt', 'r') as f:
-        superhost_list = f.read().split('\n')
-    random.shuffle(superhost_list)
+    with open('./Data/Host/host_sample_list.txt', 'r') as f:
+        host_list = f.read().split('\n')
+    random.shuffle(host_list)
     count = 0
-    for uid in superhost_list:
+    for uid in host_list:
         count += 1
         if count % 20 == 0:
-            time.sleep(random.randint(200, 300))
+            time.sleep(random.randint(150, 200))
         print(count)
         print(uid)
-        if os.path.exists('./Data/Superhost/Photos/' + uid + '.jpg'):
+        if os.path.exists('./Data/Host/Photos/' + uid + '.jpg'):
             print('-----exists')
             continue
         try:
@@ -85,8 +85,8 @@ def crawl():
 
 
 if __name__ == '__main__':
-    if not os.path.exists('./Data/Superhost/Photos'):
-        os.mkdir('./Data/Superhost/Photos')
+    if not os.path.exists('./Data/Host/Photos'):
+        os.mkdir('./Data/Host/Photos')
     crawl()
-    with open('photo_failed_list.txt', 'w') as out:
+    with open('./Data/Host/photo_failed_list.txt', 'w') as out:
         out.write("\n".join(failed_list))
