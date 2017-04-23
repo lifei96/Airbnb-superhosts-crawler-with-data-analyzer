@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import urllib
-import re
 import os
 import random
 import time
@@ -31,8 +29,7 @@ def mark_failed(uid):
     failed_list.append(uid)
 
 
-def get_photo(uid):
-    driver = webdriver.Firefox()
+def get_photo(driver, uid):
     time.sleep(random.randint(16, 20))
     url = 'https://www.airbnb.com/users/show/' + uid + '?locale=en'
     try:
@@ -58,7 +55,6 @@ def get_photo(uid):
     time.sleep(random.randint(6, 10))
     opener = MyOpener()
     opener.retrieve(photo_url, './Data/Host/Photos/' + uid + '.jpg')
-    driver.quit()
 
 
 def crawl():
@@ -66,8 +62,14 @@ def crawl():
         host_list = f.read().split('\n')
     random.shuffle(host_list)
     count = 0
+    driver = webdriver.Chrome(executable_path='./chromedriver')
     for uid in host_list:
         count += 1
+        if count % 100 == 0:
+            driver.quit()
+            driver = webdriver.Chrome(executable_path='./chromedriver')
+            print ("-----webdriver restarted")
+            time.sleep(2)
         if count % 20 == 0:
             time.sleep(random.randint(150, 200))
         print(count)
@@ -76,12 +78,13 @@ def crawl():
             print('-----exists')
             continue
         try:
-            get_photo(uid)
+            get_photo(driver, uid)
         except Exception as inst:
             print type(inst)
             print inst.args
             print inst
             print('-----failed')
+    driver.quit()
 
 
 if __name__ == '__main__':
